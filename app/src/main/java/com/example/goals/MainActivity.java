@@ -59,6 +59,8 @@ public class MainActivity extends AppCompatActivity implements addGoal.AddGoalLi
                 String count = String.valueOf(db.goalDao().getAll().size());
                 Toast.makeText(getApplicationContext(), count, Toast.LENGTH_LONG).show();
                 return true;
+            case R.id.edit_option:
+                editGoal();
             default:
                 return super.onContextItemSelected(item);
         }
@@ -123,6 +125,11 @@ public class MainActivity extends AppCompatActivity implements addGoal.AddGoalLi
     public void addGoal(){
         addGoal addGoal =  new addGoal();
         addGoal.show(getSupportFragmentManager(), "Add GoalActivity");
+    }
+
+    public void editGoal(){
+        editGoal editGoal = new editGoal();
+        editGoal.show(getSupportFragmentManager(),"Edit Goal");
     }
 
     @Override

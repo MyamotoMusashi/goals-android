@@ -7,4 +7,7 @@
     <item
         android:id="@+id/count_option"
         android:title="Count"/>
+    <item
+        android:id="@+id/edit_option"
+        android:title="Edit"/>
 </menu>
