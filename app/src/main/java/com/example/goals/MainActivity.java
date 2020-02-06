@@ -129,6 +129,9 @@ public class MainActivity extends AppCompatActivity implements addGoal.AddGoalLi
 
     public void editGoal(){
         editGoal editGoal = new editGoal();
+        Bundle bundle = new Bundle();
+        bundle.putString("title", "hello");
+        editGoal.setArguments(bundle);
         editGoal.show(getSupportFragmentManager(),"Edit Goal");
     }
 

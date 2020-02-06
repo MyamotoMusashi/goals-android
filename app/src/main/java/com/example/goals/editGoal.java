@@ -34,6 +34,10 @@ public class editGoal extends AppCompatDialogFragment {
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View view = inflater.inflate(R.layout.layout_add_goal,null);
 
+        Bundle bundle = getArguments();
+        String text = "hello";
+
+
         builder.setView(view);
         builder.setTitle("Edit Goal");
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
@@ -53,6 +57,7 @@ public class editGoal extends AppCompatDialogFragment {
         });
 
         editTextTitle = view.findViewById(R.id.edit_goal_title);
+        editTextTitle.setText(text);
         editTextDescription = view.findViewById(R.id.edit_goal_description);
 
 
