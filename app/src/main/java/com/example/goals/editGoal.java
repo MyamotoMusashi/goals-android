@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatDialogFragment;
 public class editGoal extends AppCompatDialogFragment {
     private EditText editTextTitle;
     private EditText editTextDescription;
+    private EditText editTextId;
     private addGoal.AddGoalListener listener;
 
     @Override
@@ -32,11 +33,9 @@ public class editGoal extends AppCompatDialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 
         LayoutInflater inflater = getActivity().getLayoutInflater();
-        View view = inflater.inflate(R.layout.layout_add_goal,null);
+        View view = inflater.inflate(R.layout.layout_edit_goal,null);
 
         Bundle bundle = getArguments();
-        String text = "hello";
-
 
         builder.setView(view);
         builder.setTitle("Edit Goal");
@@ -57,7 +56,9 @@ public class editGoal extends AppCompatDialogFragment {
         });
 
         editTextTitle = view.findViewById(R.id.edit_goal_title);
-        editTextTitle.setText(text);
+        editTextTitle.setText(bundle.getString("title"));
+        editTextId = view.findViewById(R.id.edit_goal_id);
+        editTextId.setText(bundle.getString("id"));
         editTextDescription = view.findViewById(R.id.edit_goal_description);
 
 

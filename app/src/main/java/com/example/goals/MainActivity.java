@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity implements addGoal.AddGoalLi
                 Toast.makeText(getApplicationContext(), count, Toast.LENGTH_LONG).show();
                 return true;
             case R.id.edit_option:
-                editGoal();
+                editGoal(goal.getId().toString(), goal.getGoal());
             default:
                 return super.onContextItemSelected(item);
         }
@@ -70,6 +70,34 @@ public class MainActivity extends AppCompatActivity implements addGoal.AddGoalLi
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        init();
+    }
+
+    public void addGoal(){
+        addGoal addGoal =  new addGoal();
+        addGoal.show(getSupportFragmentManager(), "Add GoalActivity");
+    }
+
+    public void editGoal(String id, String title){
+        editGoal editGoal = new editGoal();
+        Bundle bundle = new Bundle();
+        bundle.putString("id", id);
+        bundle.putString("title", title);
+        editGoal.setArguments(bundle);
+        editGoal.show(getSupportFragmentManager(),"Edit Goal");
+    }
+
+    @Override
+    public void applyTexts(String title, String description) {
+        //boolean insertData = goalsDB.addData(title);
+        GoalEntity newGoal = new GoalEntity();
+        newGoal.setGoal(title);
+        newGoal.setDescription(description);
+        db.goalDao().insertOne(newGoal);
+        init();
+    }
+
+    public void init(){
         db = Room.databaseBuilder(getApplicationContext(),
                 AppDatabase.class, "goals_room").allowMainThreadQueries().fallbackToDestructiveMigration().build();
 
@@ -120,27 +148,5 @@ public class MainActivity extends AppCompatActivity implements addGoal.AddGoalLi
 
             }
         });
-    }
-
-    public void addGoal(){
-        addGoal addGoal =  new addGoal();
-        addGoal.show(getSupportFragmentManager(), "Add GoalActivity");
-    }
-
-    public void editGoal(){
-        editGoal editGoal = new editGoal();
-        Bundle bundle = new Bundle();
-        bundle.putString("title", "hello");
-        editGoal.setArguments(bundle);
-        editGoal.show(getSupportFragmentManager(),"Edit Goal");
-    }
-
-    @Override
-    public void applyTexts(String title, String description) {
-        //boolean insertData = goalsDB.addData(title);
-        GoalEntity newGoal = new GoalEntity();
-        newGoal.setGoal(title);
-        newGoal.setDescription(description);
-        db.goalDao().insertOne(newGoal);
     }
 }
