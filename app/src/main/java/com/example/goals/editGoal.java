@@ -15,13 +15,13 @@ public class editGoal extends AppCompatDialogFragment {
     private EditText editTextTitle;
     private EditText editTextDescription;
     private EditText editTextId;
-    private addGoal.AddGoalListener listener;
+    private editGoal.EditGoalListener listener;
 
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         try {
-            listener = (addGoal.AddGoalListener) context;
+            listener = (editGoal.EditGoalListener) context;
         } catch (ClassCastException e) {
             throw new ClassCastException(context.toString() + "must implement AddGoalListener");
         }
@@ -50,7 +50,8 @@ public class editGoal extends AppCompatDialogFragment {
             public void onClick(DialogInterface dialog, int which) {
                 String title = editTextTitle.getText().toString();
                 String description = editTextDescription.getText().toString();
-                listener.applyTexts(title,description);
+                String id = editTextId.getText().toString();
+                listener.editTexts(title,description, id);
 
             }
         });
@@ -65,7 +66,7 @@ public class editGoal extends AppCompatDialogFragment {
         return builder.create();
     }
 
-    public interface AddGoalListener{
-        void applyTexts(String title, String description);
+    public interface EditGoalListener{
+        void editTexts(String title, String description, String id);
     }
 }

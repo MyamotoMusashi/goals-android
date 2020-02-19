@@ -30,6 +30,9 @@ public interface GoalDao {
     @Query("SELECT * FROM goalentity WHERE goal LIKE :goal LIMIT 1")
     GoalEntity findByName(String goal);
 
+    @Query("UPDATE goalentity SET goal = :goal WHERE id LIKE :id")
+    void editGoal(String goal, String id);
+
     @Insert
     void insertAll(GoalEntity... goals);
 

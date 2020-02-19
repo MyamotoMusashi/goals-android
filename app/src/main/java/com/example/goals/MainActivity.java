@@ -25,7 +25,7 @@ import io.reactivex.SingleObserver;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Consumer;
 
-public class MainActivity extends AppCompatActivity implements addGoal.AddGoalListener {
+public class MainActivity extends AppCompatActivity implements addGoal.AddGoalListener, editGoal.EditGoalListener {
 
     List<GoalEntity> goalitems;
     ArrayAdapter<GoalEntity> goalsAdapter;
@@ -94,6 +94,12 @@ public class MainActivity extends AppCompatActivity implements addGoal.AddGoalLi
         newGoal.setGoal(title);
         newGoal.setDescription(description);
         db.goalDao().insertOne(newGoal);
+        init();
+    }
+
+    @Override
+    public void editTexts(String title, String description, String id){
+        db.goalDao().editGoal(title, id);
         init();
     }
 
