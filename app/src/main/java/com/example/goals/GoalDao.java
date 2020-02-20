@@ -15,10 +15,6 @@ import io.reactivex.Single;
 @Dao
 public interface GoalDao {
 
-
-    @Query("UPDATE goalentity SET parent_goal = 0 WHERE parent_goal IS NULL")
-    void fixForAllGoalsWithParentGoalNull();
-
     @Query("SELECT * FROM goalentity")
     List<GoalEntity> getAll();
 
@@ -29,13 +25,13 @@ public interface GoalDao {
     List<GoalEntity> loadAllByIds(int[] userIds);
 
     @Query("SELECT * FROM goalentity WHERE parent_goal LIKE :goalId")
-    List<GoalEntity> loadGoalsById(int goalId);
+    Single<List<GoalEntity>> loadGoalsById(int goalId);
 
     @Query("SELECT * FROM goalentity WHERE goal LIKE :goal LIMIT 1")
     GoalEntity findByName(String goal);
 
-    @Query("UPDATE goalentity SET goal = :goal WHERE id LIKE :id")
-    void editGoal(String goal, String id);
+    @Query("UPDATE goalentity SET goal = :goal, parent_goal = :parentGoal WHERE id LIKE :id")
+    void editGoal(String goal, String id, String parentGoal);
 
     @Insert
     void insertAll(GoalEntity... goals);

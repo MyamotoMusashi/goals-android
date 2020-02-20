@@ -18,16 +18,19 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.reactivex.SingleObserver;
+import io.reactivex.disposables.Disposable;
 
-public class GoalActivity extends AppCompatActivity implements AddTask.AddTaskListener{
+
+public class GoalActivity extends AppCompatActivity implements AddTask.AddTaskListener, editGoal.EditGoalListener {
 
     private List<GoalEntity> tasksItems;
+    private String oldParentGoal;
     private ArrayAdapter<GoalEntity> tasksAdapter;
     private ListView tasksListView;
     private Button addTaskButton;
     private DatabaseHelper goalsDB;
     AppDatabase db;
-
 
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
@@ -54,6 +57,8 @@ public class GoalActivity extends AppCompatActivity implements AddTask.AddTaskLi
                 String count = String.valueOf(db.goalDao().getAll().size());
                 Toast.makeText(getApplicationContext(), count, Toast.LENGTH_LONG).show();
                 return true;
+            case R.id.edit_option:
+                editGoal(goal.getId().toString(), goal.getGoal(), goal.getParentGoal());
             default:
                 return super.onContextItemSelected(item);
         }
@@ -67,47 +72,10 @@ public class GoalActivity extends AppCompatActivity implements AddTask.AddTaskLi
         String goal = getIntent().getStringExtra("goal");
         String id = getIntent().getStringExtra("id");
         setTitle(goal + id);
+        oldParentGoal = id;
 
         goalsDB = new DatabaseHelper(this);
-        db = Room.databaseBuilder(getApplicationContext(),
-                AppDatabase.class, "goals_room").allowMainThreadQueries().fallbackToDestructiveMigration().build();
-
-        /*Cursor cursor = goalsDB.getItemID(goal);
-        cursor.moveToFirst();
-        int id = cursor.getInt(0);
-        Cursor goalsData = goalsDB.getListContentsByID(id);
-
-        while (goalsData.moveToNext()){
-            tasksItems.add(goalsData.getString(1));
-        }
-
-         */
-        tasksItems = db.goalDao().loadGoalsById(Integer.parseInt(id));
-        tasksAdapter = new ArrayAdapter<GoalEntity>(this, android.R.layout.simple_list_item_1,tasksItems);
-        tasksListView = (ListView) findViewById(R.id.tasks_list_view);
-        tasksListView.setAdapter(tasksAdapter);
-
-        tasksListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                GoalEntity goal = (GoalEntity) tasksListView.getItemAtPosition(position);
-                Intent GoalIntent = new Intent(GoalActivity.this, GoalActivity.class);
-                GoalIntent.putExtra("goal", goal.toString() );
-                GoalIntent.putExtra("id", goal.getId().toString());
-                startActivity(GoalIntent);
-            }
-        });
-
-        registerForContextMenu(tasksListView);
-
-        addTaskButton = findViewById(R.id.add_task_button);
-        addTaskButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                addTask();
-            }
-        });
-
+        init(id);
     }
 
     public void addTask(){
@@ -122,8 +90,71 @@ public class GoalActivity extends AppCompatActivity implements AddTask.AddTaskLi
         subGoal.setGoal(title);
         subGoal.setParentGoal(id);
         long subGoalId = db.goalDao().insertOne(subGoal);
-        tasksItems.clear();
-        tasksItems = db.goalDao().loadGoalsById(id);
-        tasksAdapter.notifyDataSetChanged();
+        init(String.valueOf(id));
+    }
+
+    @Override
+    public void editTexts(String title, String description, String id, String parentGoal){
+        if(parentGoal.equals("0")) {
+            parentGoal = null;
+        }
+        db.goalDao().editGoal(title, id, parentGoal);
+        init(oldParentGoal);
+    }
+
+    public void editGoal(String id, String title, Integer parentGoal){
+        editGoal editGoal = new editGoal();
+        Bundle bundle = new Bundle();
+        bundle.putString("id", id);
+        bundle.putString("title", title);
+        bundle.putString("parent_goal",String.valueOf(parentGoal));
+        editGoal.setArguments(bundle);
+        editGoal.show(getSupportFragmentManager(),"Edit Goal");
+    }
+
+    public void init(String id){
+        db = Room.databaseBuilder(getApplicationContext(),
+                AppDatabase.class, "goals_room").allowMainThreadQueries().fallbackToDestructiveMigration().build();
+
+        db.goalDao().loadGoalsById(Integer.parseInt(id)).subscribe(new SingleObserver<List<GoalEntity>>() {
+            @Override
+            public void onSubscribe(Disposable d) {
+
+            }
+
+            @Override
+            public void onSuccess(List<GoalEntity> goalEntities) {
+                tasksItems = goalEntities;
+                tasksAdapter = new ArrayAdapter<GoalEntity>(GoalActivity.this, android.R.layout.simple_list_item_1,tasksItems);
+                tasksListView = (ListView) findViewById(R.id.tasks_list_view);
+                tasksListView.setAdapter(tasksAdapter);
+
+                tasksListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        GoalEntity goal = (GoalEntity) tasksListView.getItemAtPosition(position);
+                        Intent GoalIntent = new Intent(GoalActivity.this, GoalActivity.class);
+                        GoalIntent.putExtra("goal", goal.toString() );
+                        GoalIntent.putExtra("id", goal.getId().toString());
+                        startActivity(GoalIntent);
+                    }
+                });
+
+                registerForContextMenu(tasksListView);
+
+                addTaskButton = findViewById(R.id.add_task_button);
+                addTaskButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        addTask();
+                    }
+                });
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+        });
     }
 }

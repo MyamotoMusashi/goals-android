@@ -4,12 +4,15 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatDialogFragment;
+
+import java.util.Objects;
 
 public class editGoal extends AppCompatDialogFragment {
     private EditText editTextTitle;
@@ -52,7 +55,8 @@ public class editGoal extends AppCompatDialogFragment {
                 String title = editTextTitle.getText().toString();
                 String description = editTextDescription.getText().toString();
                 String id = editTextId.getText().toString();
-                listener.editTexts(title,description, id);
+                String parentGoal = editParentGoal.getText().toString();
+                listener.editTexts(title,description, id, parentGoal);
 
             }
         });
@@ -63,12 +67,17 @@ public class editGoal extends AppCompatDialogFragment {
         editTextId.setText(bundle.getString("id"));
         editTextDescription = view.findViewById(R.id.edit_goal_description);
         editParentGoal = view.findViewById(R.id.edit_goal_parent_goal);
-        editParentGoal.setText(bundle.getString("parent_goal"));
-        
+        if(bundle.getString("parent_goal" ) == "null") {
+            editParentGoal.setText("0");
+        }
+        else {
+            editParentGoal.setText(bundle.getString("parent_goal"));
+        }
+
         return builder.create();
     }
 
     public interface EditGoalListener{
-        void editTexts(String title, String description, String id);
+        void editTexts(String title, String description, String id, String parentGoal);
     }
 }

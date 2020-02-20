@@ -90,7 +90,6 @@ public class MainActivity extends AppCompatActivity implements addGoal.AddGoalLi
 
     @Override
     public void applyTexts(String title, String description) {
-        //boolean insertData = goalsDB.addData(title);
         GoalEntity newGoal = new GoalEntity();
         newGoal.setGoal(title);
         newGoal.setDescription(description);
@@ -99,8 +98,13 @@ public class MainActivity extends AppCompatActivity implements addGoal.AddGoalLi
     }
 
     @Override
-    public void editTexts(String title, String description, String id){
-        db.goalDao().editGoal(title, id);
+    public void editTexts(String title, String description, String id, String parentGoal){
+        System.out.println(parentGoal);
+        if(parentGoal.equals("0")) {
+            parentGoal = null;
+        }
+
+        db.goalDao().editGoal(title, id, parentGoal);
         init();
     }
 
@@ -108,11 +112,6 @@ public class MainActivity extends AppCompatActivity implements addGoal.AddGoalLi
         db = Room.databaseBuilder(getApplicationContext(),
                 AppDatabase.class, "goals_room").allowMainThreadQueries().fallbackToDestructiveMigration().build();
 
-        //goalsDB = new DatabaseHelper(this);
-        //Cursor goalsData = goalsDB.getListContents();
-        //GoalEntity item1 = new GoalEntity("gogo",null);
-        //db.goalDao().insertAll(item1);
-        //db.goalDao().fixForAllGoalsWithParentGoalNull();
         db.goalDao().getAllWithoutPanrentGoal().subscribe(new SingleObserver<List<GoalEntity>>() {
             @Override
             public void onSubscribe(Disposable d) {
