@@ -18,7 +18,12 @@
 
     <EditText
         android:id="@+id/edit_goal_description"
-        android:hint=" Description"
+        android:hint="Description"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
+    <EditText
+        android:id="@+id/edit_goal_parent_goal"
+        android:hint="Parent Goal Id"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"/>
 </LinearLayout>

@@ -15,6 +15,7 @@ public class editGoal extends AppCompatDialogFragment {
     private EditText editTextTitle;
     private EditText editTextDescription;
     private EditText editTextId;
+    private EditText editParentGoal;
     private editGoal.EditGoalListener listener;
 
     @Override
@@ -61,8 +62,9 @@ public class editGoal extends AppCompatDialogFragment {
         editTextId = view.findViewById(R.id.edit_goal_id);
         editTextId.setText(bundle.getString("id"));
         editTextDescription = view.findViewById(R.id.edit_goal_description);
-
-
+        editParentGoal = view.findViewById(R.id.edit_goal_parent_goal);
+        editParentGoal.setText(bundle.getString("parent_goal"));
+        
         return builder.create();
     }
 

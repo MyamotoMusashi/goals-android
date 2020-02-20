@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity implements addGoal.AddGoalLi
                 Toast.makeText(getApplicationContext(), count, Toast.LENGTH_LONG).show();
                 return true;
             case R.id.edit_option:
-                editGoal(goal.getId().toString(), goal.getGoal());
+                editGoal(goal.getId().toString(), goal.getGoal(), goal.getParentGoal());
             default:
                 return super.onContextItemSelected(item);
         }
@@ -78,11 +78,12 @@ public class MainActivity extends AppCompatActivity implements addGoal.AddGoalLi
         addGoal.show(getSupportFragmentManager(), "Add GoalActivity");
     }
 
-    public void editGoal(String id, String title){
+    public void editGoal(String id, String title, Integer parentGoal){
         editGoal editGoal = new editGoal();
         Bundle bundle = new Bundle();
         bundle.putString("id", id);
         bundle.putString("title", title);
+        bundle.putString("parent_goal",String.valueOf(parentGoal));
         editGoal.setArguments(bundle);
         editGoal.show(getSupportFragmentManager(),"Edit Goal");
     }
@@ -111,6 +112,7 @@ public class MainActivity extends AppCompatActivity implements addGoal.AddGoalLi
         //Cursor goalsData = goalsDB.getListContents();
         //GoalEntity item1 = new GoalEntity("gogo",null);
         //db.goalDao().insertAll(item1);
+        //db.goalDao().fixForAllGoalsWithParentGoalNull();
         db.goalDao().getAllWithoutPanrentGoal().subscribe(new SingleObserver<List<GoalEntity>>() {
             @Override
             public void onSubscribe(Disposable d) {

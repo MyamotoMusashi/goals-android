@@ -15,6 +15,10 @@ import io.reactivex.Single;
 @Dao
 public interface GoalDao {
 
+
+    @Query("UPDATE goalentity SET parent_goal = 0 WHERE parent_goal IS NULL")
+    void fixForAllGoalsWithParentGoalNull();
+
     @Query("SELECT * FROM goalentity")
     List<GoalEntity> getAll();
 
