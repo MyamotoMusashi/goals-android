@@ -5,6 +5,7 @@ import androidx.room.Dao;
 import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.Query;
+import androidx.room.Transaction;
 
 
 import java.util.List;
@@ -33,6 +34,9 @@ public interface GoalDao {
     @Query("UPDATE goalentity SET goal = :goal, parent_goal = :parentGoal WHERE id LIKE :id")
     void editGoal(String goal, String id, String parentGoal);
 
+    @Query("SELECT COUNT(*) FROM goalentity WHERE parent_goal LIKE :goalId")
+    public Single<Integer> hasChildren(int goalId);
+
     @Insert
     void insertAll(GoalEntity... goals);
 
@@ -41,5 +45,9 @@ public interface GoalDao {
 
     @Delete
     void delete(GoalEntity goal);
+
+    @Transaction
+    @Query("SELECT * FROM goalentity")
+    public List<GoalPojo> getGoalsWithSubGoals();
 
 }

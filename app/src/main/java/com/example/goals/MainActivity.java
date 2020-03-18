@@ -1,13 +1,14 @@
 package com.example.goals;
 
-import android.database.Cursor;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.room.Room;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.ContextMenu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
@@ -15,15 +16,10 @@ import android.widget.Button;
 import android.content.Intent;
 import android.widget.Toast;
 
-import org.reactivestreams.Subscriber;
-
-import java.util.ArrayList;
 import java.util.List;
 
-import io.reactivex.Observer;
 import io.reactivex.SingleObserver;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Consumer;
 
 public class MainActivity extends AppCompatActivity implements addGoal.AddGoalListener, editGoal.EditGoalListener {
 
@@ -45,12 +41,9 @@ public class MainActivity extends AppCompatActivity implements addGoal.AddGoalLi
     public boolean onContextItemSelected(MenuItem item) {
         AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
         int position = info.position;
-        //String goal = goalsListView.getItemAtPosition(position).toString();
         GoalEntity goal =  (GoalEntity) goalsListView.getItemAtPosition(position);
         switch(item.getItemId()){
             case R.id.delete_option:
-                //Cursor cursor = goalsDB.getItemID(goal);
-                //goalsDB.Recursion(cursor);
                 db.goalDao().delete(goal);
                 goalitems.remove(position);
                 goalsAdapter.notifyDataSetChanged();
@@ -73,10 +66,18 @@ public class MainActivity extends AppCompatActivity implements addGoal.AddGoalLi
         init();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        init();
+    }
+
     public void addGoal(){
         addGoal addGoal =  new addGoal();
         addGoal.show(getSupportFragmentManager(), "Add GoalActivity");
     }
+
+
 
     public void editGoal(String id, String title, Integer parentGoal){
         editGoal editGoal = new editGoal();
@@ -99,7 +100,6 @@ public class MainActivity extends AppCompatActivity implements addGoal.AddGoalLi
 
     @Override
     public void editTexts(String title, String description, String id, String parentGoal){
-        System.out.println(parentGoal);
         if(parentGoal.equals("0")) {
             parentGoal = null;
         }
@@ -121,8 +121,37 @@ public class MainActivity extends AppCompatActivity implements addGoal.AddGoalLi
             @Override
             public void onSuccess(List<GoalEntity> goalEntities) {
                 goalitems = goalEntities;
-                System.out.println(goalitems);
-                goalsAdapter = new ArrayAdapter<GoalEntity>(MainActivity.this, android.R.layout.simple_list_item_1,goalitems);
+                System.out.println(db.goalDao().getGoalsWithSubGoals().get(0).getGoal());
+                goalsAdapter = new ArrayAdapter<GoalEntity>(MainActivity.this, android.R.layout.simple_list_item_1,goalitems){
+                    @Override
+                    public View getView(int position, View convertView, final ViewGroup parent) {
+                        final View row = super.getView(position, convertView, parent);
+
+                        db.goalDao().hasChildren(super.getItem(position).getId()).subscribe(new SingleObserver<Integer>() {
+                            @Override
+                            public void onSubscribe(Disposable d) {
+
+                            }
+
+                            @Override
+                            public void onSuccess(Integer integer) {
+                                if (integer > 0) {
+
+                                    row.setBackgroundColor (Color.parseColor("#50c878"));
+                                }
+                                else {
+                                    row.setBackgroundColor (Color.WHITE);
+                                }
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+
+                            }
+                        });
+                        return row;
+                    }
+                };
                 goalsListView = findViewById(R.id.goalsListView);
                 goalsListView.setAdapter(goalsAdapter);
 

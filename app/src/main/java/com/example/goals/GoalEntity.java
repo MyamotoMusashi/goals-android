@@ -1,9 +1,13 @@
 package com.example.goals;
 
+import androidx.room.Embedded;
 import androidx.room.Entity;
 import androidx.room.ForeignKey;
 import androidx.room.PrimaryKey;
 import androidx.room.ColumnInfo;
+import androidx.room.Relation;
+
+import java.util.List;
 
 import static androidx.room.ForeignKey.CASCADE;
 
@@ -32,7 +36,6 @@ public class GoalEntity {
     public Integer getId() {
         return this.id;
     }
-
 
     public String getGoal() {
         return this.goal;

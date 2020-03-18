@@ -5,10 +5,13 @@ import android.database.Cursor;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.room.Room;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.ContextMenu;
+import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -47,8 +50,6 @@ public class GoalActivity extends AppCompatActivity implements AddTask.AddTaskLi
         System.out.println(goal);
         switch(item.getItemId()){
             case R.id.delete_option:
-                //Cursor cursor = goalsDB.getItemID(goal);
-                //goalsDB.Recursion(cursor);
                 db.goalDao().delete(goal);
                 tasksItems.remove(position);
                 tasksAdapter.notifyDataSetChanged();
@@ -125,7 +126,37 @@ public class GoalActivity extends AppCompatActivity implements AddTask.AddTaskLi
             @Override
             public void onSuccess(List<GoalEntity> goalEntities) {
                 tasksItems = goalEntities;
-                tasksAdapter = new ArrayAdapter<GoalEntity>(GoalActivity.this, android.R.layout.simple_list_item_1,tasksItems);
+                tasksAdapter = new ArrayAdapter<GoalEntity>(GoalActivity.this, android.R.layout.simple_list_item_1,tasksItems){
+                    @Override
+                    public View getView(int position, View convertView, final ViewGroup parent) {
+                        final View row = super.getView(position, convertView, parent);
+
+                        db.goalDao().hasChildren(super.getItem(position).getId()).subscribe(new SingleObserver<Integer>() {
+                            @Override
+                            public void onSubscribe(Disposable d) {
+
+                            }
+
+                            @Override
+                            public void onSuccess(Integer integer) {
+                                if (integer > 0) {
+
+                                    row.setBackgroundColor (Color.parseColor("#50c878"));
+                                }
+                                else {
+                                    row.setBackgroundColor (Color.WHITE);
+                                }
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+
+                            }
+                        });
+                        return row;
+                    }
+                };
+
                 tasksListView = (ListView) findViewById(R.id.tasks_list_view);
                 tasksListView.setAdapter(tasksAdapter);
 
